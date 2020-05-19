@@ -1,0 +1,58 @@
+@Composable
+fun swipeUsingDraggable() {
+    val itemLeft = animatedFloat(0f)
+    val itemWidth = state { 0f }
+    itemLeft.setBounds(0f, itemWidth.value/3)
+    val draggable = Modifier.draggable(
+        dragDirection = DragDirection.Horizontal,
+        onDragDeltaConsumptionRequested = { delta ->
+            Log.d("ChanLog", "onDragDeltaConsumptionRequested: $delta");
+            val old = itemLeft.value
+            itemLeft.snapTo(itemLeft.value + delta)
+            itemLeft.value - old
+        },
+        onDragStopped = {
+            Log.d("ChanLog", "onDragStopped: $it");
+            //position.fling(flingConfig, it)
+        }
+    )
+
+    val paint = remember { Paint() }
+    paint.color = Color.Red
+    Button(onClick = {
+        Log.d("ChanLog", "Clicked: Button");
+    }, backgroundColor = Color.LightGray,
+        modifier = Modifier.padding(all = 16.dp).drawOpacity(1f)) { //itemLeft.value/300f
+        Text(
+            text = "Delete",
+            style = TextStyle(
+                color = Color.Red,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+        )
+    }
+    Box(
+        modifier = draggable.offset(
+            x = itemLeft.value.dp,
+            y = 0.dp
+        )
+            .fillMaxWidth()
+            .preferredHeight(120.dp)
+            .onPositioned { coordinates ->
+                //itemWidth.value = coordinates.size.width.value * 2 / 3f
+                itemWidth.value = coordinates.size.width.value.toFloat()
+            },
+        backgroundColor = Color.Blue,
+        gravity = Alignment.Center
+    ) {
+        Text(
+            text = "Swipe Item",
+            style = TextStyle(
+                color = Color.White,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+        )
+    }
+}
